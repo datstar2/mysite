@@ -18,7 +18,7 @@ def add(request):
 
 def deleteform(request):
     no = request.GET['no']
-    data = {'no': no}
+    data = {'no' : no}
     return render(request, 'guestbook/deleteform.html')
 
 def delete(request):

@@ -20,6 +20,7 @@ from django.urls import path
 import main.views as mainviews
 import guestbook.views as guestbookviews
 import user.views as userviews
+import board.views as boardviews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,5 +36,14 @@ urlpatterns = [
     path('user/login', userviews.login),
     path('user/logout', userviews.logout),
     path('user/updateform', userviews.updateform),
-    path('user/update', userviews.update)
+    path('user/update', userviews.update),
+    path('board/', boardviews.index),
+    path('board/delete', boardviews.delete),
+    path('board/viewform', boardviews.viewform),
+    path('board/writeform', boardviews.writeform),
+    path('board/write', boardviews.write),
+    path('board/modifyform', boardviews.modifyform),
+    path('board/modify', boardviews.modify),
+    path('board/replyform', boardviews.replyform),
+    path('board/reply', boardviews.reply)
 ]

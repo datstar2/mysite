@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'main',
     'guestbook',
     'user',
-    'mathfilters'
+    'mathfilters',
+    'board'
 ]
 
 

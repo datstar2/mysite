@@ -58,6 +58,7 @@ def reply(request):
     boardmodel.insert(title, content, user_no)
     no = boardmodel.maxno()
     boardmodel.updatereply(g_no, o_no, depth, no)
+    boardmodel.neworder(g_no, o_no, no)
     return HttpResponseRedirect('/board')
 
 def delete(request):

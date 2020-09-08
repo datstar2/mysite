@@ -149,6 +149,24 @@ def maxg_no():
     conn.close()
     return ndict.get('MAX(g_no)')
 
+def neworder(g_no, o_no, no):
+    conn = getconnection()
+    cursor = conn.cursor(DictCursor)
+    sql = '''
+        update board
+    	set o_no = o_no+1
+         where g_no = %s
+          and o_no >= %s
+          and  no != %s 
+            '''
+    cursor.execute(sql, [g_no, o_no, no])
+    result = cursor.fetchone()
+    conn.commit()
+    # 자원정리
+    cursor.close()
+    conn.close()
+    return result
+
 def delete(no):
     conn = getconnection()
     cursor = conn.cursor()

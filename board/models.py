@@ -1,31 +1,62 @@
+import math
+
 from MySQLdb import connect
 from MySQLdb.cursors import DictCursor
 # from django.db import models
 
 # Create your models here.
 
-def fetchlist():
+
+def fetchlist(startcount, endcount):
     conn = getconnection()
     cursor = conn.cursor(DictCursor)
     sql = '''
-    select u.name, b.user_no, b.no, b.title, b.content, b.hit, date_format(b.reg_date,'%Y-%m-%d %h:%i:%s')as reg_date, b.g_no, b.o_no, b.depth
+ select *
+ from     
+(select @rownum := @rownum + 1 as rownum, T.*
+	from 
+   ( select u.name, b.user_no, b.no, b.title, b.content, b.hit, date_format(b.reg_date,'%%Y-%%m-%%d %%h:%%i:%%s')as reg_date, b.g_no, b.o_no, b.depth
     from board b, user u
+    join (select @rownum := 0) R 
     where b.user_no = u.no
-    order by g_no desc, o_no asc, no asc;
+    order by g_no desc, o_no asc, no asc) T) as S
+    where rownum between %s and %s
     '''
-    cursor.execute(sql)
+    cursor.execute(sql, (startcount, endcount))
     results = cursor.fetchall()
     cursor.close()
     conn.close()
     return results
 
+
+def fetchlistcount():
+    conn = getconnection()
+    cursor = conn.cursor(DictCursor)
+    sql = '''
+select @rownum := @rownum + 1 as rownum, T.*
+	from 
+   ( select u.name, b.user_no, b.no, b.title, b.content, b.hit, date_format(b.reg_date,'%Y-%m-%d %h:%i:%s')as reg_date, b.g_no, b.o_no, b.depth
+    from board b, user u
+    join (select @rownum := 0) R 
+    where b.user_no = u.no
+      order by g_no desc, o_no asc, no asc) T
+    '''
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    data = results
+    count = len(data)
+    cursor.close()
+    conn.close()
+    return count
+
 def fetchonebyno(no):
     conn = getconnection()
     cursor = conn.cursor(DictCursor)
     sql = '''
-    select no, title, content
-      from board
-     where no= %s;
+    select b.no, b.title, b.content, b.user_no
+      from board b, user u
+     where b.user_no = u.no
+      and  b.no= %s;
     '''
     cursor.execute(sql, [no])
     result = cursor.fetchone()
@@ -175,6 +206,11 @@ def delete(no):
     conn.commit()
     cursor.close()
     conn.close()
+
+def maxpage(totalcount, countpage):
+    maxpa = math.ceil(totalcount/countpage)
+    return maxpa
+
 
 def getconnection():
     return connect(user='mysite',

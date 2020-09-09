@@ -15,7 +15,7 @@
 					{% for board in boardlist %}
 					<tr>
 						<td>{{ boardlist | length | sub:forloop.counter | add:1 }}</td>
-						<td style="text-align:left; padding-left:{{ board.depth }}px">
+						<td style="text-align:left; padding-left:{{ board.depth|mul:8 }}px">
 							{% if board.depth == 0 %}
 							<a href="/board/viewform?no={{ board.no }}">{{ board.title }}</a>
 							{% else %}
@@ -25,10 +25,10 @@
 						<td>{{ board.name }}</td>
 						<td>{{ board.hit }}</td>
 						<td>{{ board.reg_date }}</td>
-						{% if request.session.auth.name == board.name %}
+						{% if request.session.auth.no == board.user_no %}
 						<td><a href="/board/delete?no={{ board.no }}" class="del">삭제</a></td>
 						{% else %}
-						<td>-</a></td>
+						<td></a></td>
 						{% endif %}
 					</tr>
 					{% endfor %}
@@ -36,17 +36,26 @@
 				<!-- pager 추가 -->
 				<div class="pager">
 					<ul>
-						<li><a href="">◀</a></li>
-						<li><a href="">1</a></li>
-						<li class="selected">2</li>
-						<li><a href="">3</a></li>
-						<li>4</li>
-						<li>5</li>
-						<li><a href="">▶</a></li>
+						{% if maxpage == page %}
+						<li><a href="/board?page={{ page|sub:1 }}">◀</a></li>
+						<li>{{ page|sub:1 }}</a></li>
+						<li class="selected">{{ page }}</li>
+						{% else %}
+						{% if page == 1 %}
+						<li class="selected">{{ page }}</li>
+						<li>2</a></li>
+						<li><a href="/board?page={{ page|add:1 }}">▶</a></li>
+						{% else %}
+						<li><a href="/board?page={{ page|sub:1 }}">◀</a></li>
+						<li>{{ page|sub:1 }}</a></li>
+						<li class="selected">{{ page }}</li>
+						<li>{{ page|add:1 }}</a></li>
+						<li><a href="/board?page={{ page|add:1 }}">▶</a></li>
+						{% endif %}
+						{% endif %}
 					</ul>
 				</div>					
 				<!-- pager 추가 -->
-				
 				<div class="bottom">
 					<a href="/board/writeform" id="new-book">글쓰기</a>
 				</div>				

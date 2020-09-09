@@ -5,8 +5,16 @@ from django.shortcuts import render
 
 
 def index(request):
-    results = boardmodel.fetchlist()
+    totalcount = boardmodel.fetchlistcount()
+    countpage = 10
+    maxpage = boardmodel.maxpage(totalcount, countpage)
+    page = int(request.GET['page'])
+    startcount = (page - 1) * countpage + 1
+    endcount = page * countpage
+    results = boardmodel.fetchlist(startcount, endcount)
     data = {'boardlist':results}
+    data['maxpage'] = maxpage
+    data['page'] = page
     return render(request, 'board/index.html', data)
 
 def writeform(request):
@@ -20,7 +28,7 @@ def write(request):
     no = boardmodel.maxno()
     gno = boardmodel.maxg_no()
     boardmodel.g_noplus(gno, no)
-    return HttpResponseRedirect('/board')
+    return HttpResponseRedirect('/board?page=1')
 
 def viewform(request):
     no = request.GET['no']
@@ -33,14 +41,17 @@ def modifyform(request):
     no = request.GET['no']
     results = boardmodel.fetchonebyno(no)
     data = {'board': results}
-    return render(request, 'board/modifyform.html', data)
+    if data['board']['user_no'] != request.session['auth']['no']:
+        return HttpResponseRedirect('/board?page=1')
+    else:
+        return render(request, 'board/modifyform.html', data)
 
 def modify(request):
     no = request.GET['no']
     title = request.POST['title']
     content = request.POST['content']
     boardmodel.updateboard(title, content, no)
-    return HttpResponseRedirect('/board')
+    return HttpResponseRedirect('/board?page=1')
 
 def replyform(request):
     no = request.GET['no']
@@ -59,9 +70,9 @@ def reply(request):
     no = boardmodel.maxno()
     boardmodel.updatereply(g_no, o_no, depth, no)
     boardmodel.neworder(g_no, o_no, no)
-    return HttpResponseRedirect('/board')
+    return HttpResponseRedirect('/board?page=1')
 
 def delete(request):
     no = request.GET['no']
     boardmodel.delete(no)
-    return HttpResponseRedirect('/board')
+    return HttpResponseRedirect('/board?page=1')
